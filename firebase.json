@@ -1,0 +1,1 @@
+{"hosting":{"public":".","ignore":["firebase.json","firestore.rules","firestore.indexes.json","functions/**","README.md",".git/**"]},"firestore":{"rules":"firestore.rules","indexes":"firestore.indexes.json"},"functions":{"source":"functions"}}

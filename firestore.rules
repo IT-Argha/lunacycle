@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /users/{uid} {
+      // The registerWithUsername Cloud Function creates this profile with Admin SDK.
+      // Admin SDK writes bypass Firestore Security Rules.
+      allow create: if false;
+      allow read: if isOwner(uid);
+      allow update: if isOwner(uid)
+        && request.resource.data.username == resource.data.username
+        && request.resource.data.usernameNormalized == resource.data.usernameNormalized;
+      // Account deletion is handled by the trusted deleteAccountData Function.
+      allow delete: if false;
+
+      match /periods/{periodId} {
+        allow read, create, update, delete: if isOwner(uid);
+      }
+    }
+
+    // Username reservations are private and can only be created/deleted by Admin SDK.
+    match /usernames/{usernameNormalized} {
+      allow read, create, update, delete: if false;
+    }
+  }
+}
